@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Avatar, Button, Paper, Grid, Typography, Container } from '@material-ui/core';
 import { GoogleLogin, googleLogout } from '@react-oauth/google'
+import { useDispatch } from 'react-redux'
+import jwt_decode from 'jwt-decode'
+import { useHistory } from 'react-router-dom';
+import { signin, signup } from '../../actions/auth'
+
 
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined'
 import Icon from './Icon'
@@ -8,19 +13,30 @@ import Input from './Input'
 
 import useStyles from './styles';
 
+const initialState = { firstName: '', lastName: '', email: '', password: '', confirmPassword: '' }
+
 function Auth() {
   const classes = useStyles();
   const [showPassword, setShowPassword] = useState(false)
   const [isSignup, setIsSignup] = useState(false)
+  const [formData, setFormData] = useState(initialState)
+  const dispatch = useDispatch()
+  const history = useHistory()
 
   const handleShowPassword = () => setShowPassword(!showPassword)
 
-  const handleSubmit = () => {
+  const handleSubmit = (e) => {
+    e.preventDefault()
     
+    if (isSignup) {
+      dispatch(signup(formData, history))
+    } else {
+      dispatch(signin(formData, history))
+    }
   }
 
-  const handleChange = () => {
-
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value, })
   }
 
   const switchMode = () => {
@@ -28,7 +44,15 @@ function Auth() {
   }
 
   const googleSuccess = async (res) => {
-    console.log(res)
+    const result = jwt_decode(res?.credential);
+
+    try {
+      dispatch({ type: 'AUTH', data: { result }})
+
+      history.push('/')
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   const googleFailure = (error) => {
@@ -60,7 +84,7 @@ function Auth() {
             { isSignup ? 'Sign Up' : 'Sign In'}
           </Button>
               <GoogleLogin
-                clientId="907691688912-0i53ahg4brihb49cfe8sh884vkfd9sud.apps.googleusercontent.com"
+                clientId={`918740139713-fl9cfss892crt46qcrmpadkqeu524f6m.apps.googleusercontent.com`}
                 render={(renderProps) => (
                   <Button className={classes.googleButton} color="primary" fullWidth onClick={renderProps.onClick} disabled={renderProps.disabled} startIcon={<Icon />} variant="contained">
                     Google Sign In
@@ -70,7 +94,7 @@ function Auth() {
                 onFailure={googleFailure}
                 cookiePolicy="single_host_origin"
               />
-          <Grid container justify="flex-end">
+          <Grid container justifyContent="flex-end">
             <Grid item>
               <Button onClick={switchMode}>
                 { isSignup ? 'Already have an account? Sign In' : "Don't have an account? Sign Up" }

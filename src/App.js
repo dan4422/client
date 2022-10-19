@@ -11,17 +11,17 @@ import Auth from './components/Auth/Auth';
 const App = () => {
 
   return (
-    <BrowserRouter>
-    <GoogleOAuthProvider clientId="907691688912-0i53ahg4brihb49cfe8sh884vkfd9sud.apps.googleusercontent.com" >
-    <Container maxWidth='lg'>
+    <GoogleOAuthProvider clientId={`918740139713-fl9cfss892crt46qcrmpadkqeu524f6m.apps.googleusercontent.com`} >
+      <BrowserRouter>
+        <Container maxWidth='lg'>
       <Navbar/>
       <Switch>
         <Route path="/" exact component={Home}/>
         <Route path="/auth" exact component={Auth}/>
       </Switch>
-    </Container>
-    </GoogleOAuthProvider>
-    </BrowserRouter>
+        </Container>
+      </BrowserRouter>
+    </GoogleOAuthProvider>  
   );
 }
 
