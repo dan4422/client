@@ -6,7 +6,7 @@ import ChipInput from 'material-ui-chip-input'
 import Form from '../Form/Form'
 import Posts from '../Posts/Posts'
 import useStyles from './styles'
-import { getPosts } from '../../actions/posts';
+import { getPosts, getPostsBySearch } from '../../actions/posts';
 import Pagination from '../Pagination'
 
 function useQuery() {
@@ -29,13 +29,19 @@ function Home() {
   },[currentId, dispatch])
 
   const searchPost = () => {
-
+    if (search.trim() || tags) {
+      //dispatch action to fetch search post
+      dispatch(getPostsBySearch({ search, tags: tags.join(',') }))
+      history.push(`/posts/search?searchQuery=${search ||'none'}&tags=${tags.join(',')}`)
+    } else {
+      history.push('/')
+    }
   }
 
   const handleKeyPress = (e) => {
     // keycode 13 is the enter key
     if (e.keyCode === 13) {
-      // search post
+      searchPost()
     }
   }
 
@@ -66,7 +72,7 @@ function Home() {
               label="Search Tags"
               variant="outlined"
             />
-            <Button onClick={searchPost} className={classes.searchButton} color="primary">searchPost</Button>
+            <Button onClick={searchPost} variant="contained" className={classes.searchButton} color="primary">Search</Button>
           </AppBar>
           <Form currentId={currentId} setCurrentId={setCurrentId}/>
           <Paper elevation={6}>
